@@ -1,7 +1,16 @@
-document.querySelector("button.btn-primary").onclick = exportTableToCSV;
-console.log("✅ export.js is loaded!");
+function downloadCSV(csv, filename) {
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename || "budget_data.csv"; // Fallback filename
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
 function exportTableToCSV() {
-    console.log("🔄 exportTableToCSV() is called!");
     const table = document.getElementById("dataTable");
     if (!table) {
         console.error("Table not found!");
@@ -46,14 +55,3 @@ function exportTableToCSV() {
     downloadCSV(csv.join("\n"), "budget_data.csv");
 }
 
-function downloadCSV(csv, filename) {
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename || "budget_data.csv"; // Fallback filename
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-}

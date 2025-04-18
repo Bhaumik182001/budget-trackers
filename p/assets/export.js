@@ -1,66 +1,59 @@
+document.querySelector("button.btn-primary").onclick = exportTableToCSV;
+console.log("✅ export.js is loaded!");
 function exportTableToCSV() {
-    var table = document.getElementById("dataTable");
-    var csv = [];
-    var headers = [];
-    var rows = table.querySelectorAll("tr");
-    
-    // Extract headers (skip "Actions" and "Recurring")
-    var headerCells = rows[0].querySelectorAll("th");
-    for (var i = 0; i < headerCells.length; i++) {
-        var headerText = headerCells[i].innerText.trim();
-        if (headerText !== "Actions" && headerText !== "Recurring") {
-            headers.push(headerText);
-        }
+    console.log("🔄 exportTableToCSV() is called!");
+    const table = document.getElementById("dataTable");
+    if (!table) {
+        console.error("Table not found!");
+        return;
     }
-    csv.push(headers.join(","));
-    
-    // Extract rows (skip "Actions" and "Recurring" columns)
-    for (var i = 1; i < rows.length; i++) {
-        var row = [];
-        var cols = rows[i].querySelectorAll("td");
-        
-        for (var j = 0; j < cols.length; j++) {
-            var colText = cols[j].innerText.trim();
-            
-            // Skip "Actions" and "Recurring" columns
-            var headerText = headerCells[j]?.innerText.trim();
-            if (headerText === "Actions" || headerText === "Recurring") {
-                continue;
-            }
-            
-            // Fix currency symbol (replace â‚¹ with ₹)
-            if (headerText === "Amount") {
-                colText = colText.replace(/â‚¹/g, "₹");
-            }
-            
-            row.push(colText);
+
+    const rows = table.querySelectorAll("tr");
+    const csv = [];
+    const headers = [];
+    const headerCells = rows[0].querySelectorAll("th");
+
+    // Filter out "Actions" and "Recurring" from headers
+    headerCells.forEach((cell, index) => {
+        const text = cell.innerText.trim();
+        if (text !== "Actions" && text !== "Recurring") {
+            headers.push(text);
         }
+    });
+    csv.push(headers.join(","));
+
+    // Process data rows (skip unwanted columns)
+    for (let i = 1; i < rows.length; i++) {
+        const row = [];
+        const cols = rows[i].querySelectorAll("td");
+        
+        cols.forEach((col, index) => {
+            const headerText = headerCells[index]?.innerText.trim();
+            if (headerText !== "Actions" && headerText !== "Recurring") {
+                let cellText = col.innerText.trim();
+                // Fix ₹ symbol if needed
+                if (headerText === "Amount") {
+                    cellText = cellText.replace(/â‚¹/g, "₹");
+                }
+                row.push(cellText);
+            }
+        });
         
         csv.push(row.join(","));
     }
-    
-    // Trigger download
-    var blob = new Blob([csv.join("\n")], { type: "text/csv" });
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "budget_data.csv";
-    a.click();
 
-    // Debug: Log the CSV content to console
-    console.log("Generated CSV:", csv.join("\n"));
-    
-    // Trigger download
+    // Trigger download with proper filename
     downloadCSV(csv.join("\n"), "budget_data.csv");
 }
 
 function downloadCSV(csv, filename) {
-    var blob = new Blob([csv], { type: "text/csv" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url); // Clean up
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename || "budget_data.csv"; // Fallback filename
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 }

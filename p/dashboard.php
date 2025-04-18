@@ -105,11 +105,12 @@ if (isset($_GET['edit'])) {
 <html lang="en">
 <head>
   <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="assets/export.js" defer></script>
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="assets/charts.js" defer></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="assets/export.js" defer></script>
   <style>
     :root {
       --terminal-green: #33ff33;
@@ -263,8 +264,7 @@ if (isset($_GET['edit'])) {
     <button type="button" onclick="exportTableToCSV()" class="btn btn-warning">
       Export CSV
     </button>
-
-    
+   
   </form>  
 
   <form method="POST" class="form-section grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
